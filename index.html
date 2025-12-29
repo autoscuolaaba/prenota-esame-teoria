@@ -72,6 +72,25 @@
         stroke-dashoffset: 50;
         animation: checkmark-draw 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.4s forwards;
       }
+      /* Dots sparkle wave animation */
+      @keyframes dot-sparkle {
+        0%, 100% {
+          transform: scale(0.5);
+          opacity: 0.1;
+        }
+        15% {
+          transform: scale(1.8);
+          opacity: 1;
+          filter: blur(0px);
+        }
+        30% {
+          transform: scale(0.5);
+          opacity: 0.1;
+        }
+      }
+      .animate-dot {
+        animation: dot-sparkle 2.5s ease-in-out infinite;
+      }
     </style>
 </head>
   <body class="antialiased text-porsche-dark selection:bg-gray-200">

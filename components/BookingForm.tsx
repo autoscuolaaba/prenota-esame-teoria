@@ -466,9 +466,13 @@ export const BookingForm: React.FC = () => {
                                     Consigliato
                                   </div>
                                 ) : (
-                                  <div className={`mt-3 grid grid-cols-7 gap-[2px] ${isSelected ? 'opacity-40' : 'opacity-20'}`}>
-                                    {[...Array(28)].map((_, i) => (
-                                      <div key={i} className={`w-1 h-1 rounded-full ${isSelected ? 'bg-white' : 'bg-gray-400'}`}></div>
+                                  <div className={`mt-3 grid grid-cols-7 gap-[2px] ${isSelected ? 'opacity-60' : 'opacity-100'}`}>
+                                    {[...Array(14)].map((_, i) => (
+                                      <div
+                                        key={i}
+                                        className={`w-[2px] h-[2px] rounded-full animate-dot ${isSelected ? 'bg-white' : 'bg-gray-400'}`}
+                                        style={{ animationDelay: `${(i % 7) * 0.12 + Math.floor(i / 7) * 0.08}s` }}
+                                      ></div>
                                     ))}
                                   </div>
                                 )}
@@ -648,6 +652,18 @@ export const BookingForm: React.FC = () => {
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       Consigliato
+                    </div>
+                  )}
+                  {/* Animated dots */}
+                  {!isUrgent && !isRecommended && (
+                    <div className={`mt-3 grid grid-cols-7 gap-[2px] ${isSelected ? 'opacity-60' : 'opacity-100'}`}>
+                      {[...Array(14)].map((_, i) => (
+                        <div
+                          key={i}
+                          className={`w-[2px] h-[2px] rounded-full animate-dot ${isSelected ? 'bg-white' : 'bg-gray-400'}`}
+                          style={{ animationDelay: `${(i % 7) * 0.12 + Math.floor(i / 7) * 0.08}s` }}
+                        ></div>
+                      ))}
                     </div>
                   )}
                 </button>
