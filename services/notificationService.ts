@@ -3,7 +3,7 @@
 // 1. Download "ntfy" app on phone (iOS/Android)
 // 2. Subscribe to the channel: autoscuola-aba-prenotazioni
 
-const NTFY_CHANNEL = 'autoscuola-aba-prenotazioni';
+const NTFY_CHANNEL = 'autoscuola-teorie';
 const NTFY_URL = `https://ntfy.sh/${NTFY_CHANNEL}`;
 
 interface BookingData {
