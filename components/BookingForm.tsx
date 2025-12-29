@@ -466,12 +466,12 @@ export const BookingForm: React.FC = () => {
                                     Consigliato
                                   </div>
                                 ) : (
-                                  <div className={`mt-3 grid grid-cols-7 gap-[2px] ${isSelected ? 'opacity-60' : 'opacity-100'}`}>
-                                    {[...Array(14)].map((_, i) => (
+                                  <div className={`mt-3 flex justify-between w-full ${isSelected ? 'opacity-60' : 'opacity-100'}`}>
+                                    {[...Array(8)].map((_, i) => (
                                       <div
                                         key={i}
-                                        className={`w-[2px] h-[2px] rounded-full animate-dot ${isSelected ? 'bg-white' : 'bg-gray-400'}`}
-                                        style={{ animationDelay: `${(i % 7) * 0.12 + Math.floor(i / 7) * 0.08}s` }}
+                                        className={`w-[4px] h-[2px] rounded-full animate-dot ${isSelected ? 'bg-red-400' : 'bg-red-600'}`}
+                                        style={{ animationDelay: `${i * 0.12}s` }}
                                       ></div>
                                     ))}
                                   </div>
@@ -656,12 +656,12 @@ export const BookingForm: React.FC = () => {
                   )}
                   {/* Animated dots */}
                   {!isUrgent && !isRecommended && (
-                    <div className={`mt-3 grid grid-cols-7 gap-[2px] ${isSelected ? 'opacity-60' : 'opacity-100'}`}>
-                      {[...Array(14)].map((_, i) => (
+                    <div className={`mt-3 flex justify-between w-full ${isSelected ? 'opacity-60' : 'opacity-100'}`}>
+                      {[...Array(8)].map((_, i) => (
                         <div
                           key={i}
-                          className={`w-[2px] h-[2px] rounded-full animate-dot ${isSelected ? 'bg-white' : 'bg-gray-400'}`}
-                          style={{ animationDelay: `${(i % 7) * 0.12 + Math.floor(i / 7) * 0.08}s` }}
+                          className={`w-[4px] h-[2px] rounded-full animate-dot ${isSelected ? 'bg-red-400' : 'bg-red-600'}`}
+                          style={{ animationDelay: `${i * 0.12}s` }}
                         ></div>
                       ))}
                     </div>
