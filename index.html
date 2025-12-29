@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="https://picsum.photos/32/32" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Autoscuola ABA - Prenotazioni</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Manrope Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        darkMode: 'class', // Enable class-based dark mode
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Manrope', 'sans-serif'],
+            },
+            colors: {
+              porsche: {
+                dark: '#0B0F19', // Main Text
+                gray: '#9CA3AF', // Secondary Text
+                light: '#F3F4F6', // Icon Backgrounds
+                accent: '#111827', // Button Black
+                bg: '#E5E7EB', // Top Background
+              }
+            },
+            boxShadow: {
+              'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
+              'float': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      html, body, #root {
+        min-height: 100vh;
+        -webkit-tap-highlight-color: transparent;
+        background-color: #E5E7EB;
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+      }
+      .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+      }
+      /* Success checkmark animation */
+      @keyframes checkmark-circle {
+        0% { transform: scale(0); opacity: 0; }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      @keyframes checkmark-draw {
+        0% { stroke-dashoffset: 50; }
+        100% { stroke-dashoffset: 0; }
+      }
+      @keyframes success-pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+        50% { box-shadow: 0 0 0 20px rgba(34, 197, 94, 0); }
+      }
+      .animate-success-circle {
+        animation: checkmark-circle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards,
+                   success-pulse 2s ease-in-out 0.6s infinite;
+      }
+      .animate-checkmark {
+        stroke-dasharray: 50;
+        stroke-dashoffset: 50;
+        animation: checkmark-draw 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.4s forwards;
+      }
+    </style>
+</head>
+  <body class="antialiased text-porsche-dark selection:bg-gray-200">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
