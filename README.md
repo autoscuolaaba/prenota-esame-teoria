@@ -43,4 +43,4 @@ Sviluppato con ☕ e pazienza da Autoscuola ABA.
 
 ---
 
-**Autoscuola ABA** • Bassano del Grappa & Cartigliano • Dal [1954] al servizio della mobilità (e della sanità mentale degli istruttori e insegnanti)
+**Autoscuola ABA** • Bassano del Grappa & Cartigliano • Dal 1954 al servizio della mobilità (e della sanità mentale degli istruttori e insegnanti)
