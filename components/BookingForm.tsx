@@ -11,6 +11,7 @@ export const BookingForm: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState({
     nome_cognome: '',
+    email: '',
     note: '',
     tipo_patente: PatenteType.B,
     mese_preferito: '',
@@ -76,6 +77,14 @@ export const BookingForm: React.FC = () => {
       alert('Inserisci il tuo Nome e Cognome');
       return;
     }
+    if (!formData.email) {
+      alert('Inserisci la tua Email');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      alert('Inserisci un indirizzo email valido');
+      return;
+    }
     if (!formData.data_scadenza) {
       alert('Inserisci la Data di Scadenza della Teoria');
       return;
@@ -92,7 +101,7 @@ export const BookingForm: React.FC = () => {
         data_scadenza: formData.data_scadenza || undefined,
         note: formData.note || undefined,
         telefono: '',
-        email: ''
+        email: formData.email
     });
     setLoading(false);
     if (!error) {
@@ -197,6 +206,21 @@ export const BookingForm: React.FC = () => {
                     value={formData.nome_cognome}
                     placeholder="Mario Rossi"
                     onChange={(e) => setFormData({...formData, nome_cognome: e.target.value})}
+                />
+
+                <InputRow
+                    icon={
+                        <div className="relative w-6 h-6">
+                            <div className="absolute inset-0 bg-gradient-to-br from-[#0B0F19] to-[#374151] rounded-lg"></div>
+                            <svg className="relative w-6 h-6 text-white p-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                    }
+                    label="Email *"
+                    value={formData.email}
+                    placeholder="mario.rossi@email.com"
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
                 />
 
                 {/* Data Scadenza Teoria */}
@@ -502,6 +526,18 @@ export const BookingForm: React.FC = () => {
               value={formData.nome_cognome}
               onChange={(e) => setFormData({...formData, nome_cognome: e.target.value})}
               placeholder="Mario Rossi"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-lg text-[#0B0F19] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0B0F19]/20 focus:border-[#0B0F19] transition-all"
+            />
+          </div>
+
+          {/* Email */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-500 mb-2">Email *</label>
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              placeholder="mario.rossi@email.com"
               className="w-full px-4 py-3 border border-gray-200 rounded-xl text-lg text-[#0B0F19] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0B0F19]/20 focus:border-[#0B0F19] transition-all"
             />
           </div>

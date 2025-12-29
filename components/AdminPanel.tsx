@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Card, Button, Input, SelectChip, StatusBadge } from './UI';
 import { Prenotazione, PrenotazioneStato, AdminFilters } from '../types';
 import { PrenotazioneService } from '../services/supabaseService';
+import { EmailService } from '../services/emailService';
 
 const ADMIN_PASSWORD = '5jPY10^TA5G$%!';
 
@@ -45,7 +46,28 @@ export const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => 
     setLoading(false);
   };
 
-  const handleStatusUpdate = async (id: string, newStatus: PrenotazioneStato) => {
+  const [sendingEmail, setSendingEmail] = useState<string | null>(null);
+
+  const handleStatusUpdate = async (id: string, newStatus: PrenotazioneStato, booking?: Prenotazione) => {
+    // Se si conferma, invia prima l'email
+    if (newStatus === PrenotazioneStato.CONFERMATO && booking?.email) {
+      setSendingEmail(id);
+      const emailResult = await EmailService.sendConfirmationEmail({
+        to: booking.email,
+        nome: booking.nome_cognome,
+        tipo_patente: booking.tipo_patente,
+        mese_preferito: booking.mese_preferito
+      });
+      setSendingEmail(null);
+
+      if (!emailResult.success) {
+        const proceed = window.confirm(
+          `Errore invio email: ${emailResult.error}\n\nVuoi confermare comunque senza inviare l'email?`
+        );
+        if (!proceed) return;
+      }
+    }
+
     await PrenotazioneService.updateStato(id, newStatus);
     fetchData();
   };
@@ -208,6 +230,7 @@ export const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => 
             <tr>
               <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Data</th>
               <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nome</th>
+              <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
               <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Patente</th>
               <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Mese Richiesto</th>
               <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Scadenza</th>
@@ -218,9 +241,9 @@ export const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => 
           </thead>
           <tbody className="divide-y divide-gray-100">
             {loading ? (
-              <tr><td colSpan={8} className="text-center py-12 text-gray-400">Caricamento...</td></tr>
+              <tr><td colSpan={9} className="text-center py-12 text-gray-400">Caricamento...</td></tr>
             ) : filteredData.length === 0 ? (
-              <tr><td colSpan={8} className="text-center py-12 text-gray-400">Nessuna prenotazione</td></tr>
+              <tr><td colSpan={9} className="text-center py-12 text-gray-400">Nessuna prenotazione</td></tr>
             ) : filteredData.map(item => (
               <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                 <td className="py-4 px-6 text-sm text-gray-500">
@@ -228,6 +251,9 @@ export const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => 
                 </td>
                 <td className="py-4 px-6">
                   <span className="font-semibold text-[#0B0F19]">{item.nome_cognome}</span>
+                </td>
+                <td className="py-4 px-6 text-sm text-gray-500 max-w-[180px] truncate" title={item.email || ''}>
+                  {item.email || '-'}
                 </td>
                 <td className="py-4 px-6">
                   <span className="px-2 py-1 bg-gray-100 rounded-md text-sm font-medium">{item.tipo_patente}</span>
@@ -265,10 +291,11 @@ export const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => 
                     )}
                     {item.stato !== 'confermato' && (
                       <button
-                        onClick={() => handleStatusUpdate(item.id, PrenotazioneStato.CONFERMATO)}
-                        className="px-3 py-1.5 text-xs bg-[#0B0F19] text-white rounded-lg hover:bg-gray-800 transition-colors"
+                        onClick={() => handleStatusUpdate(item.id, PrenotazioneStato.CONFERMATO, item)}
+                        disabled={sendingEmail === item.id}
+                        className="px-3 py-1.5 text-xs bg-[#0B0F19] text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-wait"
                       >
-                        Conferma
+                        {sendingEmail === item.id ? 'Invio email...' : 'Conferma'}
                       </button>
                     )}
                   </div>
@@ -321,10 +348,11 @@ export const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => 
               )}
               {item.stato !== 'confermato' && (
                 <button
-                  onClick={() => handleStatusUpdate(item.id, PrenotazioneStato.CONFERMATO)}
-                  className="px-3 py-1 text-xs bg-[#0B0F19] text-white rounded-lg"
+                  onClick={() => handleStatusUpdate(item.id, PrenotazioneStato.CONFERMATO, item)}
+                  disabled={sendingEmail === item.id}
+                  className="px-3 py-1 text-xs bg-[#0B0F19] text-white rounded-lg disabled:opacity-50"
                 >
-                  Conferma
+                  {sendingEmail === item.id ? 'Invio...' : 'Conferma'}
                 </button>
               )}
             </div>
