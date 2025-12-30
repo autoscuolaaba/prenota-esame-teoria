@@ -151,7 +151,7 @@ export const BookingForm: React.FC = () => {
         </div>
 
         {/* Avviso importante - centrato */}
-        <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-8">
+        <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-4">
           <div className="flex flex-col items-center text-center">
             <div className="w-10 h-10 bg-amber-400 rounded-full flex items-center justify-center mb-3">
               <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -161,6 +161,21 @@ export const BookingForm: React.FC = () => {
             <p className="font-bold text-amber-800 text-sm mb-2">Attenzione</p>
             <p className="text-amber-700 text-xs leading-relaxed max-w-[280px]">
               La prenotazione nel mese richiesto <strong>NON e garantita</strong>, a meno che la scadenza non sia molto vicina. Le date degli esami sono stabilite dalla Motorizzazione.
+            </p>
+          </div>
+        </div>
+
+        {/* Avviso conferma entro il 15 */}
+        <div className="w-full bg-blue-50 border-2 border-blue-300 rounded-2xl p-5 mb-8">
+          <div className="flex flex-col items-center text-center">
+            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mb-3">
+              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <p className="font-bold text-blue-800 text-sm mb-2">Nessuna conferma entro il 15-18?</p>
+            <p className="text-blue-700 text-xs leading-relaxed max-w-[280px]">
+              Se entro il <strong>15-18 del mese che hai scelto</strong> non ricevi conferma, prenota di nuovo per il mese dopo. Probabilmente non c'è più posto.
             </p>
           </div>
         </div>
