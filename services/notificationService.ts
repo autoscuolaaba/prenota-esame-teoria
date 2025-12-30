@@ -9,8 +9,9 @@ const NTFY_URL = `https://ntfy.sh/${NTFY_CHANNEL}`;
 interface BookingData {
   nome_cognome: string;
   tipo_patente: string;
-  sede: string;
+  email: string;
   mese_preferito: string;
+  periodo_mese?: string;
   note?: string;
 }
 
@@ -20,8 +21,9 @@ export const NotificationService = {
     try {
       const message = `${booking.nome_cognome}\n` +
         `Patente: ${booking.tipo_patente}\n` +
-        `Sede: ${booking.sede}\n` +
+        `Email: ${booking.email}\n` +
         `Mese: ${booking.mese_preferito}` +
+        (booking.periodo_mese ? ` (${booking.periodo_mese})` : '') +
         (booking.note ? `\nNote: ${booking.note}` : '');
 
       await fetch(NTFY_URL, {

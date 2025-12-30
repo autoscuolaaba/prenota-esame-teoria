@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Card, Button, InputRow, SelectChip } from './UI';
-import { PatenteType } from '../types';
+import { PatenteType, PeriodoMese } from '../types';
 import { PrenotazioneService } from '../services/supabaseService';
 import { NotificationService } from '../services/notificationService';
 
@@ -15,6 +15,7 @@ export const BookingForm: React.FC = () => {
     note: '',
     tipo_patente: PatenteType.B,
     mese_preferito: '',
+    periodo_mese: '' as PeriodoMese | '',
     data_scadenza: ''
   });
 
@@ -98,6 +99,7 @@ export const BookingForm: React.FC = () => {
         nome_cognome: formData.nome_cognome,
         tipo_patente: formData.tipo_patente,
         mese_preferito: formData.mese_preferito,
+        periodo_mese: formData.periodo_mese || undefined,
         data_scadenza: formData.data_scadenza || undefined,
         note: formData.note || undefined,
         telefono: '',
@@ -222,6 +224,7 @@ export const BookingForm: React.FC = () => {
                     placeholder="mario.rossi@email.com"
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                 />
+                <p className="text-xs text-gray-400 -mt-2 mb-2 ml-[52px]">Necessaria per ricevere la conferma della prenotazione</p>
 
                 {/* Data Scadenza Teoria */}
                 <div className="flex items-center gap-3 py-4">
@@ -286,6 +289,25 @@ export const BookingForm: React.FC = () => {
                     </div>
                 )}
 
+                {/* Avviso solo 1 tentativo */}
+                {urgentMonth && (
+                    <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-4 mb-4">
+                        <div className="flex items-start gap-3">
+                            <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p className="font-bold text-red-800 text-sm mb-1">Attenzione: solo 1 tentativo!</p>
+                                <p className="text-red-700 text-xs leading-relaxed">
+                                    La tua scadenza è molto vicina. Avrai <strong>solo 1 possibilità</strong> per passare l'esame invece delle 2 normalmente previste.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Separatore visivo */}
                 <div className="h-4"></div>
 
@@ -339,6 +361,9 @@ export const BookingForm: React.FC = () => {
                             <span className={`text-2xl font-bold capitalize ${formData.mese_preferito ? 'text-[#0B0F19]' : 'text-gray-300'}`}>
                               {formData.mese_preferito || 'Seleziona...'}
                             </span>
+                            {formData.periodo_mese && (
+                              <span className="ml-2 text-sm text-gray-500">({formData.periodo_mese})</span>
+                            )}
                             <span className="block text-sm text-gray-400 font-medium mt-0.5">Mese Richiesto *</span>
                         </div>
                     }
@@ -444,7 +469,7 @@ export const BookingForm: React.FC = () => {
                             return (
                               <button
                                 key={month}
-                                onClick={() => { setFormData({...formData, mese_preferito: month}); setActiveModal('none'); }}
+                                onClick={() => setFormData({...formData, mese_preferito: month, periodo_mese: ''})}
                                 className={`relative p-4 rounded-2xl border-2 transition-all duration-300 ${
                                   isSelected
                                     ? 'border-[#0B0F19] bg-[#0B0F19] text-white shadow-lg scale-[1.02]'
@@ -504,6 +529,39 @@ export const BookingForm: React.FC = () => {
                             );
                           })}
                         </div>
+
+                        {/* Selezione Periodo del Mese */}
+                        {formData.mese_preferito && (
+                          <div className="mt-4 bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-300 rounded-2xl p-5">
+                            <div className="flex items-center justify-center gap-2 mb-4">
+                              <svg className="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              <p className="text-sm font-semibold text-red-800">Quando preferisci nel mese?</p>
+                            </div>
+                            <div className="flex gap-2 justify-center">
+                              {Object.values(PeriodoMese).map((periodo) => (
+                                <button
+                                  key={periodo}
+                                  onClick={() => { setFormData({...formData, periodo_mese: periodo}); setActiveModal('none'); }}
+                                  className={`px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                                    formData.periodo_mese === periodo
+                                      ? 'bg-red-500 text-white shadow-lg scale-105'
+                                      : 'bg-white text-gray-700 border border-gray-200 hover:border-red-300 hover:bg-red-50'
+                                  }`}
+                                >
+                                  {periodo}
+                                </button>
+                              ))}
+                            </div>
+                            <button
+                              onClick={() => setActiveModal('none')}
+                              className="w-full mt-4 py-2 text-red-600 text-sm font-medium hover:text-red-800"
+                            >
+                              Salta, nessuna preferenza
+                            </button>
+                          </div>
+                        )}
                       </div>
                     )}
                 </div>
@@ -540,6 +598,7 @@ export const BookingForm: React.FC = () => {
               placeholder="mario.rossi@email.com"
               className="w-full px-4 py-3 border border-gray-200 rounded-xl text-lg text-[#0B0F19] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0B0F19]/20 focus:border-[#0B0F19] transition-all"
             />
+            <p className="text-xs text-gray-400 mt-1">Necessaria per ricevere la conferma della prenotazione</p>
           </div>
 
           {/* Data Scadenza */}
@@ -575,6 +634,25 @@ export const BookingForm: React.FC = () => {
                   </svg>
                   Chiedi su WhatsApp
                 </a>
+              </div>
+            )}
+
+            {/* Avviso solo 1 tentativo - Desktop */}
+            {urgentMonth && (
+              <div className="mt-3 bg-red-50 border border-red-300 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="font-bold text-red-800 text-sm">Attenzione: solo 1 tentativo!</p>
+                    <p className="text-red-700 text-xs">
+                      La tua scadenza è molto vicina. Avrai <strong>solo 1 possibilità</strong> per passare l'esame invece delle 2 normalmente previste.
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -643,7 +721,7 @@ export const BookingForm: React.FC = () => {
               return (
                 <button
                   key={month}
-                  onClick={() => setFormData({...formData, mese_preferito: month})}
+                  onClick={() => setFormData({...formData, mese_preferito: month, periodo_mese: ''})}
                   className={`relative p-5 rounded-2xl border-2 transition-all duration-300 text-left ${
                     isSelected
                       ? 'border-[#0B0F19] bg-[#0B0F19] text-white shadow-lg'
@@ -706,6 +784,33 @@ export const BookingForm: React.FC = () => {
               );
             })}
           </div>
+
+          {/* Selezione Periodo del Mese - Desktop */}
+          {formData.mese_preferito && (
+            <div className="mt-6 bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-300 rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <svg className="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-sm font-semibold text-red-800">Quando preferisci nel mese? (opzionale)</p>
+              </div>
+              <div className="flex gap-3">
+                {Object.values(PeriodoMese).map((periodo) => (
+                  <button
+                    key={periodo}
+                    onClick={() => setFormData({...formData, periodo_mese: periodo})}
+                    className={`px-5 py-3 rounded-xl text-sm font-bold transition-all ${
+                      formData.periodo_mese === periodo
+                        ? 'bg-red-500 text-white shadow-lg scale-105'
+                        : 'bg-white text-gray-700 border border-gray-200 hover:border-red-300 hover:bg-red-50'
+                    }`}
+                  >
+                    {periodo}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Info aggiuntiva */}
           <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">

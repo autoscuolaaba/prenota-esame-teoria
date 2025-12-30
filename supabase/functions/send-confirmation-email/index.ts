@@ -15,6 +15,7 @@ interface EmailRequest {
   nome: string
   tipo_patente: string
   mese_preferito: string
+  periodo_mese?: string
 }
 
 serve(async (req) => {
@@ -24,7 +25,7 @@ serve(async (req) => {
   }
 
   try {
-    const { to, nome, tipo_patente, mese_preferito }: EmailRequest = await req.json()
+    const { to, nome, tipo_patente, mese_preferito, periodo_mese }: EmailRequest = await req.json()
 
     if (!to || !nome) {
       return new Response(
@@ -61,7 +62,7 @@ serve(async (req) => {
 
       <h2>Ciao ${nome.split(' ')[0]}!</h2>
 
-      <p>La tua prenotazione per l'esame di teoria patente <strong>${tipo_patente}</strong> nel mese di <strong>${mese_preferito}</strong> e stata <strong>CONFERMATA</strong>!</p>
+      <p>La tua prenotazione per l'esame di teoria patente <strong>${tipo_patente}</strong> nel mese di <strong>${mese_preferito}</strong>${periodo_mese ? ` (${periodo_mese})` : ''} e stata <strong>CONFERMATA</strong>!</p>
 
       <div class="info-box">
         <p><strong>Prossimi passi:</strong></p>

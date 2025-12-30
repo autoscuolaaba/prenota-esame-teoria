@@ -8,6 +8,7 @@ interface EmailData {
   nome: string;
   tipo_patente: string;
   mese_preferito: string;
+  periodo_mese?: string;
 }
 
 export const EmailService = {
