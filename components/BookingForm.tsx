@@ -175,7 +175,7 @@ export const BookingForm: React.FC = () => {
             </div>
             <p className="font-bold text-blue-800 text-sm mb-2">Nessuna conferma entro il 15-18?</p>
             <p className="text-blue-700 text-xs leading-relaxed max-w-[280px]">
-              Se entro il <strong>15-18 del mese che hai scelto</strong> non ricevi conferma, prenota di nuovo per il mese dopo. Probabilmente non c'è più posto.
+              Se entro il <strong>15-18 del mese che hai scelto</strong> non ricevi la conferma via email, prenota di nuovo per il mese dopo. Probabilmente non c'è più posto.
             </p>
           </div>
         </div>
