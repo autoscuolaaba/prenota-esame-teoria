@@ -843,7 +843,7 @@ export const BookingForm: React.FC = () => {
                 </svg>
               </div>
               <p className="text-sm text-amber-700">
-                La prenotazione nel mese richiesto <strong>NON è garantita</strong>. Le date degli esami sono stabilite dalla Motorizzazione.
+                La prenotazione nel mese richiesto <strong>NON è garantita</strong>, a meno che la scadenza non sia molto vicina. Le date degli esami sono stabilite dalla Motorizzazione.
               </p>
             </div>
           </div>
