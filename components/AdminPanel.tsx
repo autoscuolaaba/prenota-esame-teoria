@@ -56,7 +56,8 @@ export const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => 
         to: booking.email,
         nome: booking.nome_cognome,
         tipo_patente: booking.tipo_patente,
-        mese_preferito: booking.mese_preferito
+        mese_preferito: booking.mese_preferito,
+        periodo_mese: booking.periodo_mese
       });
       setSendingEmail(null);
 
@@ -80,15 +81,16 @@ export const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => 
   };
 
   const exportCSV = () => {
-    const headers = ['Data', 'Nome', 'Telefono', 'Patente', 'Mese', 'Scadenza Teoria', 'Stato', 'Note'];
+    const headers = ['Data', 'Nome', 'Email', 'Patente', 'Mese', 'Periodo', 'Scadenza Teoria', 'Stato', 'Note'];
     const csvContent = [
       headers.join(','),
       ...filteredData.map(row => [
         new Date(row.created_at).toLocaleDateString(),
         `"${row.nome_cognome}"`,
-        row.telefono,
+        `"${row.email || ''}"`,
         row.tipo_patente,
         `"${row.mese_preferito}"`,
+        `"${row.periodo_mese || ''}"`,
         `"${row.data_scadenza || ''}"`,
         row.stato,
         `"${row.note || ''}"`
@@ -258,7 +260,12 @@ export const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => 
                 <td className="py-4 px-6">
                   <span className="px-2 py-1 bg-gray-100 rounded-md text-sm font-medium">{item.tipo_patente}</span>
                 </td>
-                <td className="py-4 px-6 text-sm text-gray-700">{item.mese_preferito}</td>
+                <td className="py-4 px-6 text-sm text-gray-700">
+                  {item.mese_preferito}
+                  {item.periodo_mese && (
+                    <span className="block text-xs text-red-500 font-medium">{item.periodo_mese}</span>
+                  )}
+                </td>
                 <td className="py-4 px-6 text-sm text-gray-500">
                   {item.data_scadenza ? new Date(item.data_scadenza).toLocaleDateString('it-IT') : '-'}
                 </td>
@@ -321,9 +328,9 @@ export const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => 
               }`}>{item.stato}</span>
             </div>
 
-            <div className="flex gap-4 text-xs text-gray-500 mb-3">
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mb-3">
               <span>{item.tipo_patente}</span>
-              <span>{item.mese_preferito.split(' ')[0]}</span>
+              <span>{item.mese_preferito.split(' ')[0]}{item.periodo_mese && <span className="text-red-500 font-medium"> ({item.periodo_mese})</span>}</span>
               {item.data_scadenza && <span>Scad: {new Date(item.data_scadenza).toLocaleDateString('it-IT')}</span>}
             </div>
 
