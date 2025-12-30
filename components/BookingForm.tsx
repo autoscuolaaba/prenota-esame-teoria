@@ -26,6 +26,13 @@ export const BookingForm: React.FC = () => {
   const mesiItaliani = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
                         'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
 
+  // Funzione per capitalizzare la prima lettera di ogni parola
+  const capitalizeWords = (str: string): string => {
+    return str.split(' ').map(word =>
+      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join(' ');
+  };
+
   // Funzione per calcolare il mese consigliato (2 mesi prima della scadenza)
   const getRecommendedMonth = (): string | null => {
     if (!formData.data_scadenza) return null;
@@ -222,7 +229,7 @@ export const BookingForm: React.FC = () => {
                     label="Nome e Cognome *"
                     value={formData.nome_cognome}
                     placeholder="Mario Rossi"
-                    onChange={(e) => setFormData({...formData, nome_cognome: e.target.value})}
+                    onChange={(e) => setFormData({...formData, nome_cognome: capitalizeWords(e.target.value)})}
                 />
 
                 <InputRow
@@ -597,7 +604,7 @@ export const BookingForm: React.FC = () => {
             <input
               type="text"
               value={formData.nome_cognome}
-              onChange={(e) => setFormData({...formData, nome_cognome: e.target.value})}
+              onChange={(e) => setFormData({...formData, nome_cognome: capitalizeWords(e.target.value)})}
               placeholder="Mario Rossi"
               className="w-full px-4 py-3 border border-gray-200 rounded-xl text-lg text-[#0B0F19] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0B0F19]/20 focus:border-[#0B0F19] transition-all"
             />
