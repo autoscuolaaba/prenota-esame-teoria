@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 // Traffic lights component with hover state
-function TrafficLights() {
+export function TrafficLights({ onClose }: { onClose?: () => void }) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -10,13 +10,16 @@ function TrafficLights() {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div className="w-3 h-3 rounded-full bg-traffic-red flex items-center justify-center">
+      <button
+        onClick={onClose}
+        className="w-3 h-3 rounded-full bg-traffic-red flex items-center justify-center hover:brightness-90 transition-all"
+      >
         {hovered && (
           <svg className="w-[6px] h-[6px]" viewBox="0 0 8 8" fill="none" stroke="#4a0002" strokeWidth="1.5" strokeLinecap="round">
             <path d="M1 1l6 6M7 1L1 7" />
           </svg>
         )}
-      </div>
+      </button>
       <div className="w-3 h-3 rounded-full bg-traffic-yellow flex items-center justify-center">
         {hovered && (
           <svg className="w-[6px] h-[6px]" viewBox="0 0 8 8" fill="none" stroke="#995700" strokeWidth="1.5" strokeLinecap="round">

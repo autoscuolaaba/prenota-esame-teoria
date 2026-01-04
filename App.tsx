@@ -3,7 +3,7 @@ import { HashRouter, Routes, Route, useLocation, useNavigate } from 'react-route
 import { BookingForm } from './components/BookingForm';
 import { AdminPanel } from './components/AdminPanel';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { WindowChrome, ThemeToggle } from './components/macos/WindowChrome';
+import { WindowChrome, ThemeToggle, TrafficLights } from './components/macos/WindowChrome';
 
 // Mobile top bar component
 const MobileTopBar: React.FC<{ isAdmin?: boolean }> = ({ isAdmin }) => {
@@ -105,15 +105,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <div className="flex flex-col min-h-screen">
             {/* Toolbar */}
             <div className="macos-titlebar h-12 flex items-center px-4 border-b border-macos-border">
-              <div className="flex gap-2 mr-4">
-                <button
-                  onClick={() => navigate('/')}
-                  className="w-3 h-3 rounded-full bg-traffic-red hover:brightness-90 transition-all"
-                  title="Torna al form"
-                />
-                <div className="w-3 h-3 rounded-full bg-traffic-yellow" />
-                <div className="w-3 h-3 rounded-full bg-traffic-green" />
-              </div>
+              <TrafficLights onClose={() => navigate('/')} />
               <span className="text-sm font-medium text-macos-text-secondary flex-1 text-center">
                 Pannello Amministrazione
               </span>
