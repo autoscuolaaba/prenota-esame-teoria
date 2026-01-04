@@ -5,50 +5,102 @@
     <link rel="icon" type="image/svg+xml" href="https://picsum.photos/32/32" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Autoscuola ABA - Prenotazioni</title>
+
+    <!-- Anti-flicker: Apply saved theme or follow system preference -->
+    <script>
+      (function() {
+        const saved = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        // If user saved a preference, use it. Otherwise follow system.
+        if (saved === 'dark' || (saved !== 'light' && prefersDark)) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Manrope Font -->
+
+    <!-- Inter Font (closest to SF Pro) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config = {
-        darkMode: 'class', // Enable class-based dark mode
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Manrope', 'sans-serif'],
-            },
-            colors: {
-              porsche: {
-                dark: '#0B0F19', // Main Text
-                gray: '#9CA3AF', // Secondary Text
-                light: '#F3F4F6', // Icon Backgrounds
-                accent: '#111827', // Button Black
-                bg: '#E5E7EB', // Top Background
-              }
-            },
-            boxShadow: {
-              'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
-              'float': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-            }
-          }
-        }
-      }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
+      /* CSS Variables for theming */
+      :root {
+        /* Light Mode - Apple-inspired palette */
+        --bg-primary: #ffffff;
+        --bg-secondary: #f5f5f7;
+        --bg-tertiary: #e8e8ed;
+        --bg-elevated: #ffffff;
+
+        --text-primary: #1d1d1f;
+        --text-secondary: #86868b;
+        --text-tertiary: #aeaeb2;
+
+        --accent-blue: #ff3b30;
+        --accent-green: #34c759;
+        --accent-orange: #ff9500;
+        --accent-red: #ff3b30;
+
+        --border-light: rgba(0, 0, 0, 0.06);
+        --border-medium: rgba(0, 0, 0, 0.12);
+        --divider: rgba(0, 0, 0, 0.08);
+
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+        --shadow-window: 0 22px 70px 4px rgba(0, 0, 0, 0.16);
+
+        /* Traffic lights */
+        --traffic-red: #ff5f57;
+        --traffic-yellow: #febc2e;
+        --traffic-green: #28c840;
+      }
+
+      :root.dark {
+        /* Dark Mode */
+        --bg-primary: #1c1c1e;
+        --bg-secondary: #2c2c2e;
+        --bg-tertiary: #3a3a3c;
+        --bg-elevated: #2c2c2e;
+
+        --text-primary: #f5f5f7;
+        --text-secondary: #98989d;
+        --text-tertiary: #636366;
+
+        --accent-blue: #ff453a;
+        --accent-green: #32d74b;
+        --accent-orange: #ff9f0a;
+        --accent-red: #ff453a;
+
+        --border-light: rgba(255, 255, 255, 0.06);
+        --border-medium: rgba(255, 255, 255, 0.12);
+        --divider: rgba(255, 255, 255, 0.08);
+
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+        --shadow-window: 0 22px 70px 4px rgba(0, 0, 0, 0.5);
+      }
+
       html, body, #root {
         min-height: 100vh;
         -webkit-tap-highlight-color: transparent;
-        background-color: #E5E7EB;
+        background-color: var(--bg-secondary);
+        color: var(--text-primary);
+        transition: background-color 0.2s ease, color 0.2s ease;
       }
+
       .scrollbar-hide::-webkit-scrollbar {
-          display: none;
+        display: none;
       }
       .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
       }
+
       /* Success checkmark animation */
       @keyframes checkmark-circle {
         0% { transform: scale(0); opacity: 0; }
@@ -60,8 +112,8 @@
         100% { stroke-dashoffset: 0; }
       }
       @keyframes success-pulse {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
-        50% { box-shadow: 0 0 0 20px rgba(34, 197, 94, 0); }
+        0%, 100% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.4); }
+        50% { box-shadow: 0 0 0 20px rgba(52, 199, 89, 0); }
       }
       .animate-success-circle {
         animation: checkmark-circle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards,
@@ -72,6 +124,7 @@
         stroke-dashoffset: 50;
         animation: checkmark-draw 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.4s forwards;
       }
+
       /* Dots sparkle wave animation */
       @keyframes dot-sparkle {
         0%, 100% {
@@ -91,9 +144,83 @@
       .animate-dot {
         animation: dot-sparkle 2.5s ease-in-out infinite;
       }
+
+      /* macOS Window styling */
+      .macos-window {
+        box-shadow: var(--shadow-window);
+        border: 1px solid var(--border-light);
+        background: var(--bg-primary);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      .macos-titlebar {
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-light);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+
+      .macos-sidebar {
+        background: var(--bg-secondary);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+
+      /* Segmented control sliding indicator */
+      .segmented-indicator {
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
     </style>
-</head>
-  <body class="antialiased text-porsche-dark selection:bg-gray-200">
+
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            },
+            colors: {
+              macos: {
+                bg: 'var(--bg-primary)',
+                'bg-secondary': 'var(--bg-secondary)',
+                'bg-tertiary': 'var(--bg-tertiary)',
+                'bg-elevated': 'var(--bg-elevated)',
+                text: 'var(--text-primary)',
+                'text-secondary': 'var(--text-secondary)',
+                'text-tertiary': 'var(--text-tertiary)',
+                accent: 'var(--accent-blue)',
+                success: 'var(--accent-green)',
+                warning: 'var(--accent-orange)',
+                danger: 'var(--accent-red)',
+                border: 'var(--border-light)',
+                'border-medium': 'var(--border-medium)',
+                divider: 'var(--divider)',
+              },
+              traffic: {
+                red: 'var(--traffic-red)',
+                yellow: 'var(--traffic-yellow)',
+                green: 'var(--traffic-green)',
+              }
+            },
+            boxShadow: {
+              'macos-sm': 'var(--shadow-sm)',
+              'macos-md': 'var(--shadow-md)',
+              'macos-lg': 'var(--shadow-lg)',
+              'macos-window': 'var(--shadow-window)',
+            },
+            borderRadius: {
+              'macos': '12px',
+              'macos-lg': '16px',
+            }
+          }
+        }
+      }
+    </script>
+  </head>
+  <body class="antialiased selection:bg-blue-100 dark:selection:bg-blue-900/30">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>
