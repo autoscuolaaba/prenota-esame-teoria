@@ -31,7 +31,6 @@ Fine. Niente login, niente account, niente "ho dimenticato la password".
 
 ## 🔗 Link utili
 
-- 🌐 **App live**: [autoscuolaaba.github.io/aba-esami-teoria](https://autoscuolaaba.github.io/aba-esami-teoria/)
 - 📱 **WhatsApp**: [0424 523690](https://wa.me/390424523690)
 - 📍 **Dove siamo**: Galleria G.B. Verci 6, Bassano del Grappa
 
