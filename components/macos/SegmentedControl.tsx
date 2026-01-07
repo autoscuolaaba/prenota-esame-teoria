@@ -27,12 +27,12 @@ export function SegmentedControl({
           key={option.value}
           onClick={() => onChange(option.value)}
           className={`
-            font-medium rounded-lg transition-all duration-200
+            font-semibold rounded-lg transition-all duration-200
             ${sizeClasses[size]}
             ${fullWidth ? 'flex-1' : ''}
             ${value === option.value
               ? 'bg-macos-accent text-white'
-              : 'text-macos-text-secondary hover:text-macos-text hover:bg-macos-bg-tertiary'
+              : 'text-macos-text hover:bg-macos-bg-tertiary'
             }
           `}
         >

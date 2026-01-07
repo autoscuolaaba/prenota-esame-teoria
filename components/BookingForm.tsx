@@ -229,7 +229,7 @@ export const BookingForm: React.FC = () => {
             <div className="bg-[#25D366]/10 border border-[#25D366]/30 rounded-xl p-4">
               <p className="text-base font-semibold text-macos-text mb-2">Non sai la data di scadenza?</p>
               <a
-                href="https://api.whatsapp.com/send/?phone=390424523690&text=Salve!%20vorrei%20sapere%20la%20data%20di%20scadenza%20per%20poter%20prenotare%20l'esame%20di%20teoria%20sul%20sito!%20Grazie"
+                href="https://api.whatsapp.com/send/?phone=390424523690&text=Ciao!%20Vorrei%20sapere%20la%20data%20di%20scadenza%20per%20poter%20prenotare%20l'esame%20di%20teoria%20sul%20sito!%20Grazie"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-[#25D366] text-white font-semibold px-4 py-2 rounded-full text-sm"
@@ -381,8 +381,8 @@ export const BookingForm: React.FC = () => {
 
               {/* Period selection */}
               {formData.mese_preferito && (
-                <div className="mt-6 bg-macos-bg-secondary rounded-xl p-4">
-                  <p className="text-sm font-medium text-macos-text-secondary mb-3 text-center">Quando preferisci nel mese?</p>
+                <div className="mt-6 rounded-xl p-5" style={{ backgroundColor: 'rgba(255, 149, 0, 0.15)', border: '2px solid rgba(255, 149, 0, 0.4)' }}>
+                  <p className="text-base font-semibold text-macos-text mb-4 text-center">Quando preferisci nel mese?</p>
                   <SegmentedControl
                     options={Object.values(PeriodoMese).map(p => ({ value: p, label: p }))}
                     value={formData.periodo_mese}
@@ -390,9 +390,6 @@ export const BookingForm: React.FC = () => {
                     fullWidth
                     size="sm"
                   />
-                  <button onClick={() => setActiveModal('none')} className="w-full mt-3 text-sm text-macos-text-secondary">
-                    Salta, nessuna preferenza
-                  </button>
                 </div>
               )}
             </div>
@@ -466,7 +463,7 @@ export const BookingForm: React.FC = () => {
             <div className="bg-[#25D366]/10 border border-[#25D366]/30 rounded-xl p-4">
               <p className="text-base font-semibold text-macos-text mb-2">Non sai la data di scadenza?</p>
               <a
-                href="https://api.whatsapp.com/send/?phone=390424523690&text=Salve!%20vorrei%20sapere%20la%20data%20di%20scadenza%20per%20poter%20prenotare%20l'esame%20di%20teoria%20sul%20sito!%20Grazie"
+                href="https://api.whatsapp.com/send/?phone=390424523690&text=Ciao!%20Vorrei%20sapere%20la%20data%20di%20scadenza%20per%20poter%20prenotare%20l'esame%20di%20teoria%20sul%20sito!%20Grazie"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-[#25D366] text-white font-semibold px-4 py-2 rounded-lg text-sm"
@@ -558,8 +555,8 @@ export const BookingForm: React.FC = () => {
 
             {/* Period selection */}
             {formData.mese_preferito && (
-              <div className="bg-macos-bg-secondary rounded-xl p-4">
-                <p className="text-sm font-medium text-macos-text-secondary mb-3">Quando preferisci nel mese? (opzionale)</p>
+              <div className="rounded-xl p-5" style={{ backgroundColor: 'rgba(255, 149, 0, 0.15)', border: '2px solid rgba(255, 149, 0, 0.4)' }}>
+                <p className="text-base font-semibold text-macos-text mb-4">Quando preferisci nel mese?</p>
                 <SegmentedControl
                   options={Object.values(PeriodoMese).map(p => ({ value: p, label: p }))}
                   value={formData.periodo_mese}
