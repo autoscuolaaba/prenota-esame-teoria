@@ -52,6 +52,15 @@ export const BookingForm: React.FC = () => {
     return null;
   };
 
+  const getRecommendedPeriod = (): PeriodoMese | null => {
+    if (!formData.data_scadenza) return null;
+    const scadenza = new Date(formData.data_scadenza);
+    const giorno = scadenza.getDate();
+    if (giorno <= 10) return PeriodoMese.INIZIO;
+    if (giorno <= 20) return PeriodoMese.META;
+    return PeriodoMese.FINE;
+  };
+
   useEffect(() => {
     const oggi = new Date();
     const availableMonths: string[] = [];
@@ -165,6 +174,7 @@ export const BookingForm: React.FC = () => {
 
   const recommendedMonth = getRecommendedMonth();
   const urgentMonth = getUrgentMonth();
+  const recommendedPeriod = getRecommendedPeriod();
 
   // Patente options for SegmentedControl
   const patenteOptions = Object.values(PatenteType).map(v => ({ value: v, label: v }));
@@ -389,12 +399,29 @@ export const BookingForm: React.FC = () => {
                 <div className="mt-6 rounded-xl p-5" style={{ backgroundColor: 'rgba(255, 149, 0, 0.15)', border: '2px solid rgba(255, 149, 0, 0.4)' }}>
                   <p className="text-base font-semibold text-macos-text mb-4 text-center">Quando preferisci nel mese?</p>
                   <SegmentedControl
-                    options={Object.values(PeriodoMese).map(p => ({ value: p, label: p }))}
+                    options={Object.values(PeriodoMese).map(p => ({
+                      value: p,
+                      label: recommendedPeriod === p ? (
+                        <span className="flex flex-col items-center gap-1">
+                          <span>{p}</span>
+                          <span className="w-5 h-5 bg-macos-success rounded-full flex items-center justify-center animate-pulse shadow-lg shadow-macos-success/50">
+                            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          </span>
+                        </span>
+                      ) : p
+                    }))}
                     value={formData.periodo_mese}
                     onChange={(v) => { setFormData({...formData, periodo_mese: v as PeriodoMese}); setActiveModal('none'); }}
                     fullWidth
                     size="sm"
                   />
+                  {recommendedPeriod && (
+                    <p className="text-sm text-macos-danger text-center mt-3 font-bold">
+                      Consigliato: {recommendedPeriod} (scadenza giorno {new Date(formData.data_scadenza).getDate()})
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -568,11 +595,28 @@ export const BookingForm: React.FC = () => {
               <div className="rounded-xl p-5" style={{ backgroundColor: 'rgba(255, 149, 0, 0.15)', border: '2px solid rgba(255, 149, 0, 0.4)' }}>
                 <p className="text-base font-semibold text-macos-text mb-4">Quando preferisci nel mese?</p>
                 <SegmentedControl
-                  options={Object.values(PeriodoMese).map(p => ({ value: p, label: p }))}
+                  options={Object.values(PeriodoMese).map(p => ({
+                    value: p,
+                    label: recommendedPeriod === p ? (
+                      <span className="flex flex-col items-center gap-1">
+                        <span>{p}</span>
+                        <span className="w-5 h-5 bg-macos-success rounded-full flex items-center justify-center animate-pulse shadow-lg shadow-macos-success/50">
+                          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </span>
+                      </span>
+                    ) : p
+                  }))}
                   value={formData.periodo_mese}
                   onChange={(v) => setFormData({...formData, periodo_mese: v as PeriodoMese})}
                   fullWidth
                 />
+                {recommendedPeriod && (
+                  <p className="text-sm text-macos-danger mt-3 font-bold">
+                    Consigliato: {recommendedPeriod} (scadenza giorno {new Date(formData.data_scadenza).getDate()})
+                  </p>
+                )}
               </div>
             )}
 
