@@ -260,6 +260,11 @@ export const BookingForm: React.FC = () => {
                 onChange={(v) => setFormData({...formData, tipo_patente: v as PatenteType})}
                 fullWidth
               />
+              <div className="grid grid-cols-3 gap-2 mt-3 text-center">
+                <div className="text-[10px] text-macos-text-tertiary">Ciclomotori<br/>max 50cc</div>
+                <div className="text-[10px] text-macos-text-tertiary">Moto<br/>max 125cc</div>
+                <div className="text-[10px] text-macos-text-tertiary">Auto</div>
+              </div>
             </div>
 
             {/* Mese */}
@@ -446,6 +451,11 @@ export const BookingForm: React.FC = () => {
                   value={formData.tipo_patente}
                   onChange={(v) => setFormData({...formData, tipo_patente: v as PatenteType})}
                 />
+                <div className="flex gap-4 mt-3">
+                  <div className="text-[11px] text-macos-text-tertiary"><span className="font-medium text-macos-text-secondary">AM</span> - Ciclomotori (max 50cc)</div>
+                  <div className="text-[11px] text-macos-text-tertiary"><span className="font-medium text-macos-text-secondary">A1</span> - Moto (max 125cc)</div>
+                  <div className="text-[11px] text-macos-text-tertiary"><span className="font-medium text-macos-text-secondary">B</span> - Auto</div>
+                </div>
               </div>
               <div className="p-4">
                 <label className="block text-xs font-medium text-macos-text-secondary mb-1">Note (opzionale)</label>
