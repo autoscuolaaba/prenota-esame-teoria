@@ -160,7 +160,7 @@ export const BookingForm: React.FC = () => {
                 </svg>
               </div>
               <p className="text-sm text-macos-accent font-medium">
-                Se entro il <strong>15-18 del mese scelto</strong> non ricevi conferma via email, prenota di nuovo per il mese successivo.
+                Se entro il <strong>15-18 del mese precedente</strong> a quello scelto non arriva la conferma, bisognerà prenotare per il mese successivo.
               </p>
             </div>
           </div>
