@@ -4,6 +4,8 @@ import { SegmentedControl } from './macos/SegmentedControl';
 import { Prenotazione, PrenotazioneStato, AdminFilters } from '../types';
 import { PrenotazioneService } from '../services/supabaseService';
 import { EmailService } from '../services/emailService';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const ADMIN_PASSWORD = '5jPY10^TA5G$%!';
 
@@ -80,28 +82,162 @@ export const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => 
     }
   };
 
-  const exportCSV = () => {
-    const headers = ['Data', 'Nome', 'Email', 'Patente', 'Mese', 'Periodo', 'Scadenza Teoria', 'Stato', 'Note'];
-    const csvContent = [
-      headers.join(','),
-      ...filteredData.map(row => [
-        new Date(row.created_at).toLocaleDateString(),
-        `"${row.nome_cognome}"`,
-        `"${row.email || ''}"`,
-        row.tipo_patente,
-        `"${row.mese_preferito}"`,
-        `"${row.periodo_mese || ''}"`,
-        `"${row.data_scadenza || ''}"`,
-        row.stato,
-        `"${row.note || ''}"`
-      ].join(','))
-    ].join('\n');
+  const exportPDF = async () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const today = new Date().toLocaleDateString('it-IT', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `prenotazioni_aba_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
+    // Carica il logo
+    const logoUrl = 'https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=400,fit=crop,q=95/AVLx7baXQxsEDWn2/aba-png-Awv84kVo4ZfzRl7Z.png';
+
+    try {
+      const response = await fetch(logoUrl);
+      const blob = await response.blob();
+      const logoBase64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(blob);
+      });
+
+      // Header con sfondo bianco
+      doc.setFillColor(255, 255, 255);
+      doc.rect(0, 0, pageWidth, 55, 'F');
+
+      // Logo centrato - proporzioni reali (circa 2:1)
+      const logoWidth = 70;
+      const logoHeight = 38;
+      doc.addImage(logoBase64, 'PNG', (pageWidth - logoWidth) / 2, 6, logoWidth, logoHeight);
+
+      // Linea rossa sotto il logo
+      doc.setFillColor(196, 30, 58);
+      doc.rect(0, 52, pageWidth, 4, 'F');
+    } catch {
+      // Fallback se il logo non carica
+      doc.setFillColor(196, 30, 58);
+      doc.rect(0, 0, pageWidth, 40, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(24);
+      doc.setFont('helvetica', 'bold');
+      doc.text('ABA AUTOSCUOLE', pageWidth / 2, 25, { align: 'center' });
+    }
+
+    // Titolo report
+    doc.setTextColor(26, 26, 26);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Report Prenotazioni Esami Teoria', 14, 68);
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Generato il ${today}`, 14, 75);
+
+    // Box statistiche
+    const boxY = 82;
+    const boxHeight = 20;
+    const boxWidth = (pageWidth - 28 - 15) / 4;
+
+    const statsData = [
+      { label: 'TOTALI', value: filteredData.length.toString(), color: [26, 26, 26] },
+      { label: 'NUOVI', value: stats.pending.toString(), color: [196, 30, 58] },
+      { label: 'CONTATTATI', value: data.filter(d => d.stato === 'contattato').length.toString(), color: [59, 130, 246] },
+      { label: 'CONFERMATI', value: stats.confirmed.toString(), color: [16, 185, 129] }
+    ];
+
+    statsData.forEach((stat, i) => {
+      const x = 14 + (boxWidth + 5) * i;
+      doc.setFillColor(247, 247, 247);
+      doc.roundedRect(x, boxY, boxWidth, boxHeight, 2, 2, 'F');
+
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(stat.color[0], stat.color[1], stat.color[2]);
+      doc.text(stat.value, x + boxWidth / 2, boxY + 9, { align: 'center' });
+
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(120, 120, 120);
+      doc.text(stat.label, x + boxWidth / 2, boxY + 16, { align: 'center' });
+    });
+
+    // Tabella
+    const tableData = filteredData.map(row => [
+      new Date(row.created_at).toLocaleDateString('it-IT'),
+      row.nome_cognome,
+      row.tipo_patente,
+      row.mese_preferito.split(' ')[0],
+      row.periodo_mese || '-',
+      row.data_scadenza ? new Date(row.data_scadenza).toLocaleDateString('it-IT') : '-',
+      row.stato.charAt(0).toUpperCase() + row.stato.slice(1)
+    ]);
+
+    autoTable(doc, {
+      startY: 110,
+      head: [['Data', 'Nome', 'Patente', 'Mese', 'Periodo', 'Scadenza', 'Stato']],
+      body: tableData,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [26, 26, 26],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        fontSize: 9,
+        halign: 'center'
+      },
+      bodyStyles: {
+        fontSize: 9,
+        textColor: [50, 50, 50]
+      },
+      alternateRowStyles: {
+        fillColor: [250, 250, 250]
+      },
+      columnStyles: {
+        0: { cellWidth: 22, halign: 'center' },
+        1: { cellWidth: 45 },
+        2: { cellWidth: 18, halign: 'center' },
+        3: { cellWidth: 25, halign: 'center' },
+        4: { cellWidth: 28, halign: 'center' },
+        5: { cellWidth: 24, halign: 'center' },
+        6: { cellWidth: 24, halign: 'center' }
+      },
+      didParseCell: (data) => {
+        if (data.section === 'body' && data.column.index === 6) {
+          const stato = data.cell.raw?.toString().toLowerCase();
+          if (stato === 'nuovo') {
+            data.cell.styles.textColor = [196, 30, 58];
+            data.cell.styles.fontStyle = 'bold';
+          } else if (stato === 'confermato') {
+            data.cell.styles.textColor = [16, 185, 129];
+            data.cell.styles.fontStyle = 'bold';
+          } else if (stato === 'contattato') {
+            data.cell.styles.textColor = [59, 130, 246];
+            data.cell.styles.fontStyle = 'bold';
+          }
+        }
+      },
+      margin: { left: 14, right: 14 }
+    });
+
+    // Footer
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text(
+        `ABA Autoscuole - Report generato automaticamente - Pagina ${i} di ${pageCount}`,
+        pageWidth / 2,
+        doc.internal.pageSize.getHeight() - 10,
+        { align: 'center' }
+      );
+    }
+
+    // Download
+    doc.save(`prenotazioni_aba_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   const filteredData = useMemo(() => {
@@ -189,7 +325,7 @@ export const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => 
             </svg>
             <span className="hidden lg:inline">Aggiorna</span>
           </Button>
-          <Button variant="secondary" onClick={exportCSV} size="sm">CSV</Button>
+          <Button variant="secondary" onClick={exportPDF} size="sm">PDF</Button>
           <Button variant="ghost" onClick={() => {
             localStorage.removeItem('admin_session');
             setIsAuthenticated(false);
