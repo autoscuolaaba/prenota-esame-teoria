@@ -4,14 +4,19 @@ import { SegmentedControl } from './macos/SegmentedControl';
 import { Prenotazione, PrenotazioneStato, AdminFilters } from '../types';
 import { PrenotazioneService } from '../services/supabaseService';
 import { EmailService } from '../services/emailService';
+import { AuthService } from '../services/authService';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-
-const ADMIN_PASSWORD = '5jPY10^TA5G$%!';
+import type { User } from '@supabase/supabase-js';
 
 export const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [remainingAttempts, setRemainingAttempts] = useState(5);
   const [data, setData] = useState<Prenotazione[]>([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState<AdminFilters>({
@@ -19,25 +24,58 @@ export const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => 
     patente: 'Tutte',
     stato: 'Tutti'
   });
+  const [checkingSession, setCheckingSession] = useState(true);
 
+  // Check existing session on mount
   useEffect(() => {
-    const session = localStorage.getItem('admin_session');
-    const expiry = localStorage.getItem('admin_session_expiry');
-    if (session === 'true' && expiry && new Date().getTime() < parseInt(expiry)) {
-      setIsAuthenticated(true);
-      fetchData();
-    }
+    const checkSession = async () => {
+      const { user } = await AuthService.getSession();
+      if (user) {
+        setIsAuthenticated(true);
+        setCurrentUser(user);
+        fetchData();
+      }
+      setCheckingSession(false);
+    };
+    checkSession();
+
+    // Subscribe to auth state changes
+    const { unsubscribe } = AuthService.onAuthStateChange((user) => {
+      if (user) {
+        setIsAuthenticated(true);
+        setCurrentUser(user);
+      } else {
+        setIsAuthenticated(false);
+        setCurrentUser(null);
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  // Update remaining attempts display
+  useEffect(() => {
+    setRemainingAttempts(AuthService.getRemainingAttempts());
+  }, [loginError]);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordInput === ADMIN_PASSWORD) {
+    setLoginError(null);
+    setLoginLoading(true);
+
+    const result = await AuthService.signIn(emailInput, passwordInput);
+
+    setLoginLoading(false);
+
+    if (result.success) {
       setIsAuthenticated(true);
-      localStorage.setItem('admin_session', 'true');
-      localStorage.setItem('admin_session_expiry', (new Date().getTime() + 24 * 60 * 60 * 1000).toString());
+      setCurrentUser(result.user ?? null);
+      setEmailInput('');
+      setPasswordInput('');
       fetchData();
     } else {
-      alert('Password errata');
+      setLoginError(result.error ?? 'Errore di autenticazione');
+      setRemainingAttempts(AuthService.getRemainingAttempts());
     }
   };
 
@@ -259,6 +297,28 @@ export const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => 
     };
   }, [data, filteredData]);
 
+  // Handle secure logout
+  const handleLogout = async () => {
+    await AuthService.signOut();
+    setIsAuthenticated(false);
+    setCurrentUser(null);
+    onLogout();
+  };
+
+  // Loading state while checking session
+  if (checkingSession) {
+    return (
+      <div className="flex flex-col items-center justify-center px-6 pt-20 lg:pt-32">
+        <div className="w-16 h-16 bg-macos-bg-tertiary rounded-2xl flex items-center justify-center mb-4 animate-pulse">
+          <svg className="w-8 h-8 text-macos-text-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+          </svg>
+        </div>
+        <p className="text-macos-text-secondary">Verifica sessione...</p>
+      </div>
+    );
+  }
+
   // Login Screen
   if (!isAuthenticated) {
     return (
@@ -268,9 +328,29 @@ export const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => 
             <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
           </svg>
         </div>
-        <h1 className="text-xl font-bold text-macos-text mb-6">Area Riservata</h1>
+        <h1 className="text-xl font-bold text-macos-text mb-2">Area Riservata</h1>
+        <p className="text-sm text-macos-text-secondary mb-6">Accedi con le tue credenziali</p>
 
-        <form onSubmit={handleLogin} className="w-full max-w-xs space-y-4">
+        <form onSubmit={handleLogin} className="w-full max-w-xs space-y-3">
+          {/* Email field */}
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-macos-text-tertiary">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <input
+              type="email"
+              placeholder="Email"
+              value={emailInput}
+              onChange={e => setEmailInput(e.target.value)}
+              disabled={loginLoading}
+              autoComplete="email"
+              className="w-full pl-10 pr-4 py-3 bg-macos-bg border border-macos-border rounded-xl text-macos-text placeholder-macos-text-tertiary focus:outline-none focus:ring-2 focus:ring-macos-accent/30 focus:border-macos-accent transition-all disabled:opacity-50"
+            />
+          </div>
+
+          {/* Password field */}
           <div className="relative">
             <div className="absolute left-3 top-1/2 -translate-y-1/2 text-macos-text-tertiary">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -282,15 +362,50 @@ export const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => 
               placeholder="Password"
               value={passwordInput}
               onChange={e => setPasswordInput(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-macos-bg border border-macos-border rounded-xl text-macos-text placeholder-macos-text-tertiary focus:outline-none focus:ring-2 focus:ring-macos-accent/30 focus:border-macos-accent transition-all"
+              disabled={loginLoading}
+              autoComplete="current-password"
+              className="w-full pl-10 pr-4 py-3 bg-macos-bg border border-macos-border rounded-xl text-macos-text placeholder-macos-text-tertiary focus:outline-none focus:ring-2 focus:ring-macos-accent/30 focus:border-macos-accent transition-all disabled:opacity-50"
             />
           </div>
-          <Button type="submit" fullWidth size="lg">Accedi</Button>
+
+          {/* Error message */}
+          {loginError && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3">
+              <p className="text-sm text-red-600 dark:text-red-400 text-center">{loginError}</p>
+              {remainingAttempts > 0 && remainingAttempts < 5 && (
+                <p className="text-xs text-red-500 dark:text-red-500 text-center mt-1">
+                  Tentativi rimanenti: {remainingAttempts}
+                </p>
+              )}
+            </div>
+          )}
+
+          <Button type="submit" fullWidth size="lg" disabled={loginLoading || !emailInput || !passwordInput}>
+            {loginLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Accesso in corso...
+              </span>
+            ) : (
+              'Accedi'
+            )}
+          </Button>
         </form>
+
+        {/* Security notice */}
+        <div className="mt-6 flex items-center gap-2 text-xs text-macos-text-tertiary">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+          Connessione protetta
+        </div>
 
         <button
           onClick={onLogout}
-          className="mt-6 text-sm text-macos-text-secondary hover:text-macos-text transition-colors flex items-center gap-2"
+          className="mt-4 text-sm text-macos-text-secondary hover:text-macos-text transition-colors flex items-center gap-2"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -326,11 +441,7 @@ export const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => 
             <span className="hidden lg:inline">Aggiorna</span>
           </Button>
           <Button variant="secondary" onClick={exportPDF} size="sm">PDF</Button>
-          <Button variant="ghost" onClick={() => {
-            localStorage.removeItem('admin_session');
-            setIsAuthenticated(false);
-            onLogout();
-          }} size="sm">Esci</Button>
+          <Button variant="ghost" onClick={handleLogout} size="sm">Esci</Button>
         </div>
       </div>
 
