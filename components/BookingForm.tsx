@@ -137,6 +137,26 @@ export const BookingForm: React.FC = () => {
             </div>
           </div>
 
+          {/* PAYMENT DEADLINE - Most prominent banner */}
+          <div className="w-full bg-macos-danger border-2 border-macos-danger rounded-xl p-5 mb-4 shadow-lg">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center mb-3">
+                <svg className="w-6 h-6 text-macos-danger" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <p className="text-base text-white font-bold mb-2">
+                PAGAMENTO OBBLIGATORIO
+              </p>
+              <p className="text-sm text-white/90">
+                Il costo dell'esame deve essere pagato entro <strong className="text-white">2 settimane</strong> dalla comunicazione via WhatsApp della data d'esame.
+              </p>
+              <p className="text-sm text-white font-bold mt-2 bg-white/20 px-3 py-1 rounded-full">
+                Altrimenti verrai ESCLUSO e dovrai riprenotare per il mese seguente!
+              </p>
+            </div>
+          </div>
+
           {/* Warning */}
           <div className="w-full bg-macos-warning/10 border border-macos-warning/30 rounded-xl p-4 mb-4">
             <div className="flex flex-col items-center text-center">
